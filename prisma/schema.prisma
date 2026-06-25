@@ -1,0 +1,343 @@
+// ════════════════════════════════════════════════════════════════════════════
+// Delta Force — Prisma schema (starter, production-ready shape)
+// Normalized form of the prototype's in-memory arrays:
+//   VENDORS · WOs · INSPECTIONS · ESC_ACTIVE · PAY_READY · EV_PROJECTS · NOTIFS
+// Multi-tenant: every row is scoped to an Organization.
+//
+// Setup:
+//   1. npm i -D prisma && npm i @prisma/client
+//   2. Set DATABASE_URL (pooled :6543) and DIRECT_URL (:5432) in .env
+//   3. npx prisma migrate dev --name init
+//   4. npx prisma db seed
+// ════════════════════════════════════════════════════════════════════════════
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums (illegal states are unrepresentable) ─────────────────────────────
+enum Role {
+  ADMIN
+  PM
+  VENDOR
+}
+
+enum VendorStatus {
+  VERIFIED // sustained >= 90
+  CONDITIONAL // 75–89
+  BLOCKED // < 75
+}
+
+enum Urgency {
+  EMERGENCY
+  URGENT
+  ROUTINE
+}
+
+enum WorkOrderStatus {
+  INTAKE
+  ASSIGNED
+  IN_PROGRESS
+  PENDING_REVIEW
+  ESCALATED
+  CLOSED_VERIFIED
+  CLOSED_FAILED
+}
+
+enum BuildingRisk {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum InspectionResult {
+  PASS
+  CONDITIONAL
+  FAIL
+}
+
+enum EscalationState {
+  OFFERED // offered to current backup in chain
+  ASSIGNED // a backup accepted
+  EXTERNAL // chain exhausted → RFP
+  RESOLVED
+}
+
+enum PaymentStatus {
+  AWAITING_DF_APPROVAL // PM cannot process yet
+  APPROVED_FOR_PM // Delta Force quality-approved
+  PROCESSED // PM released payout
+}
+
+enum EvStatus {
+  ON_TRACK
+  ACTION_NEEDED
+  WAITING_COUNCIL
+  DONE
+}
+
+enum NotifyTarget {
+  ROLE // delivered to everyone with `role`
+  VENDOR // delivered to a specific vendor
+}
+
+// ─── Tenancy ────────────────────────────────────────────────────────────────
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+
+  users         User[]
+  buildings     Building[]
+  vendors       Vendor[]
+  workOrders    WorkOrder[]
+  payments      Payment[]
+  notifications Notification[]
+  auditLogs     AuditLog[]
+}
+
+// ─── Identity (Clerk owns auth; we own role + scope) ────────────────────────
+model User {
+  id      String @id @default(cuid())
+  clerkId String @unique
+  email   String @unique
+  name    String
+  role    Role
+
+  orgId String
+  org   Organization @relation(fields: [orgId], references: [id])
+
+  vendorId String? // set when role = VENDOR
+  vendor   Vendor? @relation(fields: [vendorId], references: [id])
+
+  pmBuildings BuildingPM[] // PM ↔ buildings scope
+
+  createdAt DateTime @default(now())
+
+  @@index([orgId])
+  @@index([clerkId])
+}
+
+model Building {
+  id         String       @id @default(cuid())
+  orgId      String
+  org        Organization @relation(fields: [orgId], references: [id])
+  name       String
+  strataPlan String?
+  risk       BuildingRisk @default(MEDIUM)
+
+  workOrders  WorkOrder[]
+  inspections Inspection[]
+  evProject   EvProject?
+  pms         BuildingPM[]
+
+  @@index([orgId])
+}
+
+// Explicit M:N — which PMs are scoped to which buildings
+model BuildingPM {
+  userId     String
+  buildingId String
+  user       User     @relation(fields: [userId], references: [id])
+  building   Building @relation(fields: [buildingId], references: [id])
+
+  @@id([userId, buildingId])
+}
+
+// ─── Vendors + scoring (status/score are DERIVED, cached by scoring service) ─
+model Vendor {
+  id               String       @id @default(cuid())
+  orgId            String
+  org              Organization @relation(fields: [orgId], references: [id])
+  name             String
+  trade            String
+  city             String
+  status           VendorStatus @default(VERIFIED) // recomputed on inspection write
+  score            Int          @default(0) // latest inspection total (cache)
+  slaPct           Int          @default(0)
+  avgRespHrs       Float        @default(0)
+  jobsCompleted    Int          @default(0)
+  insuranceCurrent Boolean      @default(true)
+  isBackup         Boolean      @default(false)
+
+  inspections Inspection[]
+  workOrders  WorkOrder[]
+  payments    Payment[]
+  users       User[]
+
+  @@index([orgId])
+  @@index([trade])
+  @@index([status])
+}
+
+// ─── Work orders ─────────────────────────────────────────────────────────────
+model WorkOrder {
+  id    String @id @default(cuid())
+  code  String @unique // "WO-2026-0089"
+  orgId String
+  org   Organization @relation(fields: [orgId], references: [id])
+
+  buildingId String
+  building   Building @relation(fields: [buildingId], references: [id])
+  unit       String?
+  issue      String
+  trade      String
+  urgency    Urgency
+  status     WorkOrderStatus @default(INTAKE)
+
+  assignedVendorId     String?
+  vendor               Vendor? @relation(fields: [assignedVendorId], references: [id])
+  assignedVendorUserId String?
+
+  slaDeadline DateTime?
+  slaPct      Int       @default(100)
+
+  proof      Proof?
+  escalation Escalation?
+  payment    Payment?
+
+  createdAt DateTime @default(now())
+
+  @@index([orgId])
+  @@index([buildingId])
+  @@index([status])
+  @@index([assignedVendorId])
+}
+
+model Proof {
+  id          String    @id @default(cuid())
+  workOrderId String    @unique
+  workOrder   WorkOrder @relation(fields: [workOrderId], references: [id])
+  notes       String
+  photos      String[] // signed-URL keys in Supabase storage
+  checklist   Json
+  submittedAt DateTime  @default(now())
+}
+
+// ─── Inspections (5-category rubric → 100-point total) ──────────────────────
+model Inspection {
+  id           String   @id @default(cuid())
+  vendorId     String
+  vendor       Vendor   @relation(fields: [vendorId], references: [id])
+  buildingId   String
+  building     Building @relation(fields: [buildingId], references: [id])
+  scheduledFor DateTime
+
+  quality         Int? // / 40
+  completeness    Int? // / 25
+  proof           Int? // / 20
+  professionalism Int? // / 10
+  safety          Int? // / 5
+  total           Int? // computed = sum of the five
+  result          InspectionResult?
+  actionRequired  String?
+
+  createdAt DateTime @default(now())
+
+  @@index([vendorId])
+  @@index([buildingId])
+  @@index([scheduledFor])
+}
+
+// ─── Escalations (Level 1–4 + ordered backup chain) ─────────────────────────
+model Escalation {
+  id          String          @id @default(cuid())
+  workOrderId String          @unique
+  workOrder   WorkOrder       @relation(fields: [workOrderId], references: [id])
+  level       Int             @default(1) // 1–4
+  state       EscalationState @default(OFFERED)
+
+  fromVendorId       String?
+  backupChain        String[] // ordered vendorIds; final entry may be 'ext'
+  chainIdx           Int      @default(0)
+  acceptedByVendorId String?
+
+  slaWindow  String
+  slaPct     Int
+  ownerLabel String
+  logs       Json // append-only event log
+
+  createdAt DateTime @default(now())
+
+  @@index([state])
+  @@index([level])
+}
+
+// ─── Payments (PM processes; Delta Force is the quality-approval gate) ───────
+model Payment {
+  id          String       @id @default(cuid())
+  orgId       String
+  org         Organization @relation(fields: [orgId], references: [id])
+  vendorId    String
+  vendor      Vendor       @relation(fields: [vendorId], references: [id])
+  workOrderId String       @unique
+  workOrder   WorkOrder    @relation(fields: [workOrderId], references: [id])
+  buildingId  String
+  invoiceNo   String
+  amount      Int // cents — never floats for money
+  status      PaymentStatus @default(AWAITING_DF_APPROVAL)
+
+  dfApprovedByUserId String?
+  processedByUserId  String?
+
+  createdAt DateTime @default(now())
+
+  @@index([orgId])
+  @@index([status])
+  @@index([vendorId])
+}
+
+// ─── EV / EPR 10-stage lifecycle ────────────────────────────────────────────
+model EvProject {
+  id         String   @id @default(cuid())
+  buildingId String   @unique
+  building   Building @relation(fields: [buildingId], references: [id])
+  stage      Int      @default(1) // 1–10
+  status     EvStatus @default(ON_TRACK)
+  priority   Boolean  @default(false)
+  note       String
+  nextStep   String
+  startedAt  DateTime @default(now())
+
+  @@index([status])
+}
+
+// ─── Notifications (role- or vendor-targeted) ───────────────────────────────
+model Notification {
+  id        String       @id @default(cuid())
+  orgId     String
+  org       Organization @relation(fields: [orgId], references: [id])
+  target    NotifyTarget
+  role      Role? // when target = ROLE
+  vendorId  String? // when target = VENDOR
+  type      String
+  message   String
+  read      Boolean      @default(false)
+  refEntity String? // deep-link target, e.g. "escalation"
+  refId     String?
+  createdAt DateTime     @default(now())
+
+  @@index([orgId, role])
+  @@index([vendorId])
+  @@index([read])
+}
+
+// ─── Audit (every privileged transition the prototype logged via NOTIFS) ────
+model AuditLog {
+  id          String       @id @default(cuid())
+  orgId       String
+  org         Organization @relation(fields: [orgId], references: [id])
+  actorUserId String
+  action      String // 'PAYMENT_APPROVED', 'ESCALATION_ADVANCED', ...
+  entity      String
+  entityId    String
+  metadata    Json?
+  createdAt   DateTime     @default(now())
+
+  @@index([orgId, createdAt])
+  @@index([entity, entityId])
+}
