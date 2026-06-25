@@ -1,8 +1,54 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Base — matte black & charcoal */
+  --black: #0B0B0B;
+  --surf: #141414;
+  --surf2: #1A1A1A;
+  --surf3: #202020;
+  --surf4: #2A2A2A;
+  --bord: #262626;
+  --bord2: #333;
+
+  /* Apple greys + soft whites */
+  --t1: #F5F5F7;
+  --t2: #A1A1A6;
+  --t3: #86868B;
+
+  /* Metallic gold */
+  --gold: #C9A14A;
+  --gold-l: #E8C97A;
+  --gold-d: #9A7A2E;
+  --gold-grad: linear-gradient(135deg, #E8C97A 0%, #C9A14A 48%, #9A7A2E 100%);
+
+  /* Soft status */
+  --grn: #4CAF7D;
+  --red: #D87C72;
+  --amb: #E0B257;
+  --blu: #6FA8C7;
+  --pur: #9B8BC4;
+  --teal: #5FB3A8;
+
+  --r: 12px;
+  --r2: 16px;
+  --r3: 22px;
+
+  --sh1: 0 2px 8px rgba(0, 0, 0, .5);
+  --sh2: 0 16px 44px rgba(0, 0, 0, .6);
+  --sh3: 0 28px 70px rgba(0, 0, 0, .7);
+
+  /* Liquid glass */
+  --glass-fill: linear-gradient(135deg, rgba(40, 40, 40, .55), rgba(18, 18, 18, .42));
+  --glass-blur: saturate(180%) blur(28px);
+  --glass-bord: rgba(255, 255, 255, .12);
+  --glass-hi: rgba(255, 255, 255, .22);
+  --glass-sh: 0 16px 50px rgba(0, 0, 0, .55), 0 2px 8px rgba(0, 0, 0, .3);
+
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Next theming */
+  --background: var(--black);
+  --foreground: var(--t1);
 }
 
 @theme inline {
@@ -12,15 +58,174 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  height: 100%;
+  background: var(--black);
+  color: var(--t1);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.gold-text {
+  display: inline-block;
+  background-color: transparent;
+  background-image: var(--gold-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.gold-btn {
+  background: var(--gold-grad);
+  color: #1A1305;
+  border: none;
+  box-shadow: 0 2px 8px rgba(201, 161, 74, 0.3);
+}
+
+.gold-btn:hover {
+  transform: translateY(-1px);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(900px 500px at 72% 8%, rgba(201, 161, 74, 0.07), transparent 58%),
+    radial-gradient(700px 600px at 20% 100%, rgba(201, 161, 74, 0.035), transparent 60%),
+    var(--black);
+  position: relative;
 }
+
+#bg-3d {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  display: block;
+}
+
+#cinema-bloom {
+  position: fixed;
+  width: 60vw;
+  height: 60vw;
+  max-width: 900px;
+  max-height: 900px;
+  border-radius: 50%;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(201, 161, 74, 0.06), transparent 65%);
+  filter: blur(40px);
+  top: -10%;
+  left: 55%;
+  animation: bloomDrift 28s var(--ease) infinite alternate;
+}
+
+#cinema-vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  background: radial-gradient(
+    140% 110% at 50% 38%,
+    transparent 46%,
+    rgba(0, 0, 0, 0.28) 80%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
+}
+
+@keyframes bloomDrift {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    transform: translate(-12%, 14%) scale(1.18);
+  }
+}
+
+/* Custom gold cursor + trail */
+@media (any-pointer: fine) {
+  html,
+  body {
+    cursor: none;
+  }
+  a,
+  button,
+  input,
+  select,
+  textarea,
+  .nav-item,
+  .kpi,
+  .vendor-card,
+  .job-card,
+  tbody tr,
+  [onclick] {
+    cursor: pointer;
+  }
+}
+
+#gold-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--gold-grad);
+  box-shadow: 0 0 12px rgba(201, 161, 74, 0.7);
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: width 0.15s, height 0.15s, opacity 0.2s;
+  mix-blend-mode: screen;
+}
+
+#gold-cursor.tap {
+  width: 26px;
+  height: 26px;
+  opacity: 0.6;
+}
+
+.gold-trail {
+  position: fixed;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  opacity: 0.5;
+  mix-blend-mode: screen;
+}
+
+@media (max-width: 760px) {
+  body {
+    cursor: auto;
+  }
+  a,
+  button,
+  input,
+  select,
+  textarea,
+  .nav-item,
+  .kpi,
+  .vendor-card,
+  .job-card,
+  tbody tr,
+  [onclick] {
+    cursor: pointer;
+  }
+  #gold-cursor,
+  .gold-trail {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gold-trail {
+    display: none;
+  }
+}
+

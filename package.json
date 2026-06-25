@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node --stack-size=8192 ./node_modules/typescript/bin/tsc --noEmit && next build",
+    "typecheck": "node --stack-size=8192 ./node_modules/typescript/bin/tsc --noEmit",
     "start": "next start",
     "lint": "eslint"
   },
@@ -16,10 +17,12 @@
     "@tanstack/react-query": "^5.101.1",
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.38.0",
+    "lucide-react": "^1.21.0",
     "next": "16.2.9",
     "prisma": "^7.8.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "three": "^0.185.0",
     "tsx": "^4.22.4",
     "zod": "^4.4.3",
     "zustand": "^5.0.14"
@@ -32,6 +35,6 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5.7.3"
   }
 }
