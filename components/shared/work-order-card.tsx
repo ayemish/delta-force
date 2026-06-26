@@ -1,4 +1,4 @@
-import { Building } from "lucide-react";
+import { Building2 } from "lucide-react";
 import type { WorkOrder } from "@/lib/types";
 import { StatusPill, UrgencyBadge } from "@/components/shared/status-pill";
 import { SlaBar } from "@/components/shared/sla-bar";
@@ -19,7 +19,7 @@ export default function WorkOrderCard({ wo, showDetails = true, onOpen }: WorkOr
   return (
     <div
       onClick={onOpen}
-      className={`wo-card flex cursor-pointer items-center gap-5 rounded-[var(--r2)] border border-[var(--bord)] border-l-[3px] bg-[linear-gradient(160deg,rgba(26,26,26,.82),rgba(20,20,20,.82))] p-5 shadow-[var(--sh1)] backdrop-blur-[8px] transition-all duration-200 ease-[var(--ease)] hover:-translate-y-0.5 hover:border-[var(--bord2)] hover:shadow-[var(--sh2)] lg:px-6 ${urgencyBorder[wo.urgency]}`}
+      className={`wo-card flex cursor-pointer items-center gap-5 rounded-[var(--r2)] border-t border-r border-b border-l-[3px] border-t-[var(--bord)] border-r-[var(--bord)] border-b-[var(--bord)] bg-[linear-gradient(160deg,rgba(26,26,26,.82),rgba(20,20,20,.82))] p-5 shadow-[var(--sh1)] backdrop-blur-[8px] transition-all duration-200 ease-[var(--ease)] hover:-translate-y-0.5 hover:border-t-[var(--bord2)] hover:border-r-[var(--bord2)] hover:border-b-[var(--bord2)] hover:shadow-[var(--sh2)] lg:px-6 ${urgencyBorder[wo.urgency]}`}
     >
       <div className="wo-card-main min-w-0 flex-1">
         <div className="wo-card-top mb-2 flex flex-wrap items-center gap-2.5">
@@ -27,13 +27,13 @@ export default function WorkOrderCard({ wo, showDetails = true, onOpen }: WorkOr
             {wo.id.replace("WO-2026-", "#")}
           </span>
           <UrgencyBadge urgency={wo.urgency} />
-          {showDetails && <span className="tag">{wo.trade}</span>}
+          {showDetails && <span className="inline-flex rounded-[6px] border border-[var(--bord)] bg-[var(--surf3)] px-[9px] py-[3px] text-[11px] font-medium text-[var(--t2)]">{wo.trade}</span>}
         </div>
         <div className="wo-issue mb-1.5 text-[17px] font-semibold leading-[1.3] tracking-[-0.2px] text-[var(--t1)]">
           {wo.issue}
         </div>
         <div className="wo-loc flex items-center gap-1.5 text-[13px] text-[var(--t3)]">
-          <Building size={13} className="opacity-70" />
+          <Building2 size={13} className="opacity-70" />
           {wo.building}
           {showDetails && <> · {wo.unit}</>}
           {showDetails && <> · {wo.owner}</>}
