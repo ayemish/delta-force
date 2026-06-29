@@ -1,15 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import AuthLayout from "@/components/auth/auth-layout";
 import AuthCard from "@/components/auth/auth-card";
 import AuthInput from "@/components/auth/auth-input";
 import AuthButton from "@/components/auth/auth-button";
 import AuthLink from "@/components/auth/auth-link";
-import { CheckCircle, AlertCircle, Eye, EyeOff } from "lucide-react";
+import { CheckCircle, AlertCircle, Eye, EyeOff, ArrowLeft } from "lucide-react";
 
-export default function ConfirmResetPasswordPage() {
+function ConfirmResetPasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [formData, setFormData] = useState({
@@ -239,10 +239,26 @@ export default function ConfirmResetPasswordPage() {
         {/* Back to Sign In */}
         <div className="text-center text-[var(--t2)] text-sm">
           <AuthLink href="/signin">
-            ← Back to sign in
+            <ArrowLeft /> Back to sign in
           </AuthLink>
         </div>
       </AuthCard>
     </AuthLayout>
+  );
+}
+
+export default function ConfirmResetPasswordPage() {
+  return (
+    <Suspense fallback={
+      <AuthLayout title="Reset Password - Delta Force">
+        <AuthCard title="Loading..." subtitle="Please wait">
+          <div className="text-center py-8">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--gold)]"></div>
+          </div>
+        </AuthCard>
+      </AuthLayout>
+    }>
+      <ConfirmResetPasswordContent />
+    </Suspense>
   );
 }
