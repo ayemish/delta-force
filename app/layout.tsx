@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Background from "@/components/background";
-import CustomCursor from "@/components/custom-cursor";
-import Shell from "@/components/shell";
+import LayoutWrapper from "@/components/layout-wrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,9 +30,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
-        <Shell>{children}</Shell>
-        <Background />
-        <CustomCursor />
+        <LayoutWrapper>{children}</LayoutWrapper>
       </body>
     </html>
   );
