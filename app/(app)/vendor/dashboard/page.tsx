@@ -5,6 +5,7 @@ import EmptyState from "@/components/shared/empty-state";
 import DeltaBadge from "@/components/shared/delta-badge";
 import { getVendorDashboardMetrics, VENDOR_USER_ID, priorFor } from "@/lib/vendor/dashboard";
 import { cadShort } from "@/lib/formatting";
+import { getTimeBasedGreeting } from "@/lib/greeting";
 
 export default function VendorDashboardPage() {
   const M = getVendorDashboardMetrics(VENDOR_USER_ID);
@@ -18,7 +19,7 @@ export default function VendorDashboardPage() {
       <PageHeader
       greeting={
           <span>
-            Good evening,{" "}
+            {getTimeBasedGreeting()},{" "}
             <span className="gold-text">
               Jordan
             </span>

@@ -5,6 +5,7 @@ import AttentionItem from "@/components/shared/attention-item";
 import EmptyState from "@/components/shared/empty-state";
 import DeltaBadge from "@/components/shared/delta-badge";
 import { getPmDashboardMetrics, priorFor } from "@/lib/pm/dashboard";
+import { getTimeBasedGreeting } from "@/lib/greeting";
 
 export default function PmDashboardPage() {
   const M = getPmDashboardMetrics();
@@ -36,7 +37,7 @@ export default function PmDashboardPage() {
       <PageHeader
       greeting={
           <span>
-            Good evening,{" "}
+            {getTimeBasedGreeting()},{" "}
             <span className="gold-text">
               Alex
             </span>

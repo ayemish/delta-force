@@ -5,6 +5,7 @@ import Card from "@/components/shared/card";
 import AttentionItem from "@/components/shared/attention-item";
 import EmptyState from "@/components/shared/empty-state";
 import { adminDashboard } from "@/lib/admin/dashboard";
+import { getTimeBasedGreeting } from "@/lib/greeting";
 
 export default function AdminDashboardPage() {
   return (
@@ -12,7 +13,7 @@ export default function AdminDashboardPage() {
       <PageHeader
         greeting={
           <span>
-            Good evening,{" "}
+            {getTimeBasedGreeting()},{" "}
             <span className="gold-text">Marcus</span>
           </span>
         }
