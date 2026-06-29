@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import Shell from "@/components/shell";
 import Background from "@/components/background";
 import CustomCursor from "@/components/custom-cursor";
+import ToastProvider from "@/components/toast-provider";
 import type { ReactNode } from "react";
 
 interface LayoutWrapperProps {
@@ -16,19 +17,19 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
 
   if (isAuthRoute) {
     return (
-      <>
+      <ToastProvider>
         {children}
         <Background />
         <CustomCursor />
-      </>
+      </ToastProvider>
     );
   }
 
   return (
-    <>
+    <ToastProvider>
       <Shell>{children}</Shell>
       <Background />
       <CustomCursor />
-    </>
+    </ToastProvider>
   );
 }

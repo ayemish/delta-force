@@ -13,6 +13,7 @@ type SidebarProps = {
   onNav?: (page: string) => void;
   open?: boolean;
   onClose?: () => void;
+  onOpenSettings?: () => void;
 };
 
 const badgeClasses = (cls: "nb-red" | "nb-gold") =>
@@ -26,6 +27,7 @@ export default function Sidebar({
   onNav,
   open,
   onClose,
+  onOpenSettings,
 }: SidebarProps) {
   const cfg = roleConfig[role];
 
@@ -82,7 +84,10 @@ export default function Sidebar({
         </div>
       ))}
       <div className="mt-auto px-3 pb-2 pt-4">
-        <button className="flex w-full items-center gap-[13px] rounded-[11px] border-0 bg-transparent px-[18px] py-[11px] text-left font-[inherit] text-[14px] font-medium text-[var(--t2)] transition-all duration-200 ease-[var(--ease)] hover:bg-[var(--surf3)] hover:text-[var(--t1)]">
+        <button
+          onClick={onOpenSettings}
+          className="flex w-full items-center gap-[13px] rounded-[11px] border-0 bg-transparent px-[18px] py-[11px] text-left font-[inherit] text-[14px] font-medium text-[var(--t2)] transition-all duration-200 ease-[var(--ease)] hover:bg-[var(--surf3)] hover:text-[var(--t1)]"
+        >
           <span className="inline-flex h-[20px] w-[20px] shrink-0 items-center justify-center text-[17px] opacity-90 [&>svg]:block">
             {navIcon("settings")}
           </span>

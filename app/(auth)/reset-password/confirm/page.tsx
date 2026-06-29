@@ -133,7 +133,7 @@ function ConfirmResetPasswordContent() {
               
               <div className="text-center text-[var(--t2)] text-sm">
                 <AuthLink href="/signin">
-                  Back to sign in
+                  ← Back to sign in
                 </AuthLink>
               </div>
             </div>
@@ -239,7 +239,7 @@ function ConfirmResetPasswordContent() {
         {/* Back to Sign In */}
         <div className="text-center text-[var(--t2)] text-sm">
           <AuthLink href="/signin">
-            <ArrowLeft /> Back to sign in
+            ← Back to sign in
           </AuthLink>
         </div>
       </AuthCard>

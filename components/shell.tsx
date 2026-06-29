@@ -6,11 +6,13 @@ import { usePathname, useRouter } from "next/navigation";
 import { roles, roleConfig, type RoleId } from "@/lib/role-config";
 import Topbar from "@/components/topbar";
 import Sidebar from "@/components/sidebar";
+import SettingsModal from "@/components/settings-modal";
 
 export default function Shell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const segments = pathname.split("/").filter(Boolean);
   const pathRole = segments[0] as RoleId;
@@ -38,6 +40,12 @@ export default function Shell({ children }: { children: ReactNode }) {
         onNav={handleNav}
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
+        onOpenSettings={() => setSettingsOpen(true)}
+      />
+      <SettingsModal
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        role={role}
       />
       <main className="col-start-1 row-start-2 overflow-y-auto lg:col-start-2">
         {children}
