@@ -77,6 +77,25 @@ export type Inspection = {
   act: string;
 };
 
+export type CalEvent = {
+  l: string;
+  c: string;
+  t: string;
+  b: string;
+  vid: string | null;
+  type: string;
+  vendorName?: string;
+  added?: boolean;
+  schedId?: string;
+};
+
+export type ScheduledInspection = CalEvent & {
+  id: string;
+  year: number;
+  month: number;
+  day: number;
+};
+
 export type PayReady = {
   v: string;
   vid: string;
