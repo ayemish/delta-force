@@ -1,7 +1,7 @@
 import PageHeader from "@/components/shared/page-header";
 import Card from "@/components/shared/card";
 import KpiCard from "@/components/shared/kpi-card";
-import EvProjectCard from "@/components/shared/ev-project-card";
+import EvProjectCard from "@/components/ev/ev-project-card";
 import { EV_STAGES, EV_PROJECTS, EV_BUILDINGS } from "@/lib/data/ev";
 
 export default function AdminEVReadinessPage() {

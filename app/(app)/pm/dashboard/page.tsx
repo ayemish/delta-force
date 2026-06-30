@@ -1,9 +1,9 @@
 import PageHeader from "@/components/shared/page-header";
 import KpiCard from "@/components/shared/kpi-card";
 import Card from "@/components/shared/card";
-import AttentionItem from "@/components/shared/attention-item";
+import AttentionItem from "@/components/dashboard/attention-item";
 import EmptyState from "@/components/shared/empty-state";
-import DeltaBadge from "@/components/shared/delta-badge";
+import DeltaBadge from "@/components/dashboard/delta-badge";
 import { getPmDashboardMetrics, priorFor } from "@/lib/pm/dashboard";
 import { getTimeBasedGreeting } from "@/lib/greeting";
 

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Users } from "lucide-react";
 import PageHeader from "@/components/shared/page-header";
-import VendorCard from "@/components/shared/vendor-card";
+import VendorCard from "@/components/vendors/vendor-card";
 import { getVendors, getVendorCounts, avatarColor } from "@/lib/admin/vendors";
 import type { VendorFilter } from "@/lib/admin/vendors";
 

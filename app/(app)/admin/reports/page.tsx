@@ -1,8 +1,8 @@
 import PageHeader from "@/components/shared/page-header";
 import Card from "@/components/shared/card";
-import SlaTradeBar from "@/components/shared/sla-trade-bar";
-import EscalationMetricCard from "@/components/shared/escalation-metric-card";
-import TenantImpactTable from "@/components/shared/tenant-impact-table";
+import SlaTradeBar from "@/components/reports/sla-trade-bar";
+import EscalationMetricCard from "@/components/escalations/escalation-metric-card";
+import TenantImpactTable from "@/components/reports/tenant-impact-table";
 import { adminReports } from "@/lib/admin/reports";
 
 export default function AdminReportsPage() {

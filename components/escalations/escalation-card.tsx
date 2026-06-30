@@ -1,9 +1,9 @@
 "use client";
 
 import { Send } from "lucide-react";
-import ElBadge from "@/components/shared/el-badge";
-import OwnerBadge from "@/components/shared/owner-badge";
-import VendorStatusPill from "@/components/shared/vendor-status-pill";
+import ElBadge from "@/components/escalations/el-badge";
+import OwnerBadge from "@/components/escalations/owner-badge";
+import VendorStatusPill from "@/components/vendors/vendor-status-pill";
 import { getNextFramework } from "@/lib/admin/escalations";
 import { VENDORS } from "@/lib/data/vendors";
 import type { Escalation } from "@/lib/admin/escalations";

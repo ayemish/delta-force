@@ -2,7 +2,7 @@ import { ChevronUp, ChevronDown } from "lucide-react";
 import PageHeader from "@/components/shared/page-header";
 import KpiCard from "@/components/shared/kpi-card";
 import Card from "@/components/shared/card";
-import AttentionItem from "@/components/shared/attention-item";
+import AttentionItem from "@/components/dashboard/attention-item";
 import EmptyState from "@/components/shared/empty-state";
 import { adminDashboard } from "@/lib/admin/dashboard";
 import { getTimeBasedGreeting } from "@/lib/greeting";

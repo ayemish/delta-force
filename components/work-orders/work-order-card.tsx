@@ -1,7 +1,7 @@
 import { Building2 } from "lucide-react";
 import type { WorkOrder } from "@/lib/types";
-import { StatusPill, UrgencyBadge } from "@/components/shared/status-pill";
-import { SlaBar } from "@/components/shared/sla-bar";
+import { StatusPill, UrgencyBadge } from "@/components/work-orders/status-pill";
+import { SlaBar } from "@/components/work-orders/sla-bar";
 
 type WorkOrderCardProps = {
   wo: WorkOrder;

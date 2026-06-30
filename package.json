@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "node --stack-size=8192 ./node_modules/typescript/bin/tsc --noEmit && next build",
+    "dev": "node init && next dev",
+    "build": "node init && node --stack-size=8192 ./node_modules/typescript/bin/tsc --noEmit && next build",
     "typecheck": "node --stack-size=8192 ./node_modules/typescript/bin/tsc --noEmit",
-    "start": "next start",
+    "start": "node init && next start",
     "lint": "eslint"
   },
   "dependencies": {

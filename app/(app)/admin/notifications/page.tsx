@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import PageHeader from "@/components/shared/page-header";
-import NotificationItem from "@/components/shared/notification-item";
+import NotificationItem from "@/components/notifications/notification-item";
 import { useToast } from "@/components/toast-provider";
 import { NOTIFS } from "@/lib/data/notifications";
 import type { Notification } from "@/lib/data/notifications";

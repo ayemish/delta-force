@@ -2,7 +2,7 @@
 
 import PageHeader from "@/components/shared/page-header";
 import KpiCard from "@/components/shared/kpi-card";
-import ExceptionGroup from "@/components/shared/exception-group";
+import ExceptionGroup from "@/components/exception-inbox/exception-group";
 import { cad } from "@/lib/formatting";
 import { adminExceptions } from "@/lib/admin/exceptions";
 import type { ExceptionSeverity } from "@/lib/admin/exceptions";

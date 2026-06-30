@@ -1,6 +1,6 @@
 import PageHeader from "@/components/shared/page-header";
 import Card from "@/components/shared/card";
-import InspectionCalendar from "@/components/shared/inspection-calendar";
+import InspectionCalendar from "@/components/inspections/inspection-calendar";
 
 export default function AdminInspectionsPage() {
   return (

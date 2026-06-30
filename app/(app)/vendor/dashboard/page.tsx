@@ -2,7 +2,7 @@ import PageHeader from "@/components/shared/page-header";
 import KpiCard from "@/components/shared/kpi-card";
 import Card from "@/components/shared/card";
 import EmptyState from "@/components/shared/empty-state";
-import DeltaBadge from "@/components/shared/delta-badge";
+import DeltaBadge from "@/components/dashboard/delta-badge";
 import { getVendorDashboardMetrics, VENDOR_USER_ID, priorFor } from "@/lib/vendor/dashboard";
 import { cadShort } from "@/lib/formatting";
 import { getTimeBasedGreeting } from "@/lib/greeting";

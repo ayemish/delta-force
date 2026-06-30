@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { AlertTriangle } from "lucide-react";
 import PageHeader from "@/components/shared/page-header";
-import EscalationCard from "@/components/shared/escalation-card";
-import ElBadge from "@/components/shared/el-badge";
+import EscalationCard from "@/components/escalations/escalation-card";
+import ElBadge from "@/components/escalations/el-badge";
 import { getActiveEscalations, getEscalationFramework } from "@/lib/admin/escalations";
 
 export default function AdminEscalationsPage() {

@@ -3,8 +3,8 @@
 import { useState } from "react";
 import PageHeader from "@/components/shared/page-header";
 import Card from "@/components/shared/card";
-import WorkOrderCard from "@/components/shared/work-order-card";
-import FilterPill from "@/components/shared/filter-pill";
+import WorkOrderCard from "@/components/work-orders/work-order-card";
+import FilterPill from "@/components/work-orders/filter-pill";
 import EmptyState from "@/components/shared/empty-state";
 import {
   getAdminWorkOrders,

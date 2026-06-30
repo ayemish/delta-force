@@ -3,7 +3,7 @@
 import { useState } from "react";
 import PageHeader from "@/components/shared/page-header";
 import KpiCard from "@/components/shared/kpi-card";
-import { PaymentSectionCard, PendingPaymentRow, ReleasedPaymentRow } from "@/components/shared/payment-card";
+import { PaymentSectionCard, PendingPaymentRow, ReleasedPaymentRow } from "@/components/payments/payment-card";
 import { getPending, getReleased, cad, cadShort } from "@/lib/admin/payments";
 import type { PayReady } from "@/lib/admin/payments";
 

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { CheckCircle } from "lucide-react";
 import PageHeader from "@/components/shared/page-header";
 import Card from "@/components/shared/card";
-import ProofCard from "@/components/shared/proof-card";
+import ProofCard from "@/components/proof-to-close/proof-card";
 import { getProofToCloseWOs, getProofCounts } from "@/lib/admin/proof-to-close";
 
 export default function ProofToClosePage() {

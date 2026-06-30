@@ -1,5 +1,5 @@
 import type { Vendor } from "@/lib/types";
-import VendorStatusPill from "@/components/shared/vendor-status-pill";
+import VendorStatusPill from "@/components/vendors/vendor-status-pill";
 import { getInitials, scoreColor } from "@/lib/admin/vendors";
 
 type Props = {

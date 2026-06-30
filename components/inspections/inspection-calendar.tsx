@@ -1,17 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useToast } from "@/components/toast-provider";
 import { VENDORS } from "@/lib/data/vendors";
 import {
   DEFAULT_TYPE_COLOR,
-  INSPECTION_BUILDINGS,
   INSPECTION_TODAY,
-  INSPECTION_TYPES,
   TRADE_TYPE_COLORS,
   inspectionsForMonth,
 } from "@/lib/data/inspections";
 import { filterEventsForPM } from "@/lib/pm/inspections";
+import InspectionDayModal from "@/components/inspections/inspection-day-modal";
+import InspectionScheduleModal from "@/components/inspections/inspection-schedule-modal";
 import type { CalEvent, ScheduledInspection } from "@/lib/types";
 
 type Role = "admin" | "pm";
@@ -212,7 +212,7 @@ export default function InspectionCalendar({ role }: { role: Role }) {
       </div>
 
       {openDay !== null && (
-        <DayDetailModal
+        <InspectionDayModal
           day={openDay}
           monthLabel={MONTH_NAMES[calMonth]}
           year={calYear}
@@ -229,7 +229,7 @@ export default function InspectionCalendar({ role }: { role: Role }) {
       )}
 
       {scheduleDay !== null && isAdmin && (
-        <ScheduleModal
+        <InspectionScheduleModal
           monthLabel={MONTH_NAMES[calMonth]}
           year={calYear}
           presetDay={scheduleDay}
@@ -238,214 +238,6 @@ export default function InspectionCalendar({ role }: { role: Role }) {
           onSubmit={addInspection}
         />
       )}
-    </div>
-  );
-}
-
-// ── Day detail modal ──
-function DayDetailModal({
-  day, monthLabel, year, events, isAdmin, onClose, onCancel, onSchedule,
-}: {
-  day: number;
-  monthLabel: string;
-  year: number;
-  events: CalEvent[];
-  isAdmin: boolean;
-  onClose: () => void;
-  onCancel: (schedId: string) => void;
-  onSchedule: () => void;
-}) {
-  return (
-    <ModalShell title={`${monthLabel} ${day}, ${year}`} onClose={onClose}>
-      <div className="px-6 py-6">
-        {events.length > 0 ? (
-          <>
-            <div className="mb-[10px] text-[12px] font-bold uppercase tracking-[0.5px] text-[var(--t3)]">
-              Scheduled ({events.length})
-            </div>
-            {events.map((ev, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-3 border-b border-white/[0.045] py-[13px] last:border-0"
-              >
-                <span className="h-[10px] w-[10px] shrink-0 rounded-[3px]" style={{ background: ev.t }} />
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 text-[14px] font-semibold text-[var(--t1)]">
-                    {ev.l}
-                    {ev.added && (
-                      <span className="rounded-[3px] bg-[rgba(201,162,74,.15)] px-[5px] py-px text-[9px] font-bold text-[var(--gold)]">
-                        ★ NEW
-                      </span>
-                    )}
-                  </div>
-                  <div className="mt-[2px] text-[12px] text-[var(--t3)]">
-                    {ev.b}
-                    {ev.type ? ` · ${ev.type}` : ""}
-                    {ev.vendorName ? ` · ${ev.vendorName}` : ""}
-                  </div>
-                </div>
-                {isAdmin && ev.added && ev.schedId && (
-                  <button
-                    onClick={() => onCancel(ev.schedId as string)}
-                    className="rounded-[9px] border border-[var(--bord2)] bg-[var(--surf3)] px-[12px] py-[7px] text-[12px] font-semibold text-[var(--t2)] transition-colors hover:border-[var(--red)] hover:text-[var(--red)]"
-                  >
-                    Cancel
-                  </button>
-                )}
-              </div>
-            ))}
-          </>
-        ) : (
-          <div className="py-[8px] text-[14px] text-[var(--t2)]">
-            No inspections scheduled for this date.
-          </div>
-        )}
-      </div>
-      <ModalFooter>
-        <button
-          onClick={onClose}
-          className="rounded-[10px] border border-[var(--bord2)] bg-[var(--surf3)] px-[16px] py-[8px] text-[13px] font-semibold text-[var(--t2)] transition-colors hover:text-[var(--t1)]"
-        >
-          Close
-        </button>
-        {isAdmin && (
-          <button
-            onClick={onSchedule}
-            className="rounded-[10px] bg-[var(--gold)] px-[16px] py-[8px] text-[13px] font-bold text-[#1A1305] transition-opacity hover:opacity-90"
-          >
-            + Schedule inspection
-          </button>
-        )}
-      </ModalFooter>
-    </ModalShell>
-  );
-}
-
-// ── Schedule inspection modal ──
-function ScheduleModal({
-  monthLabel, year, presetDay, daysInMonth, onClose, onSubmit,
-}: {
-  monthLabel: string;
-  year: number;
-  presetDay: number;
-  daysInMonth: number;
-  onClose: () => void;
-  onSubmit: (building: string, vid: string, day: number, type: string) => void;
-}) {
-  const [day, setDay] = useState(presetDay);
-  const [building, setBuilding] = useState(INSPECTION_BUILDINGS[0]);
-  const [vid, setVid] = useState(VENDORS[0]?.id ?? "");
-  const [type, setType] = useState(INSPECTION_TYPES[0]);
-
-  const selectClass =
-    "w-full rounded-[10px] border border-[var(--bord2)] bg-[var(--surf3)] px-[13px] py-[11px] text-[14px] text-[var(--t1)] outline-none transition-[border-color,box-shadow] duration-200 focus:border-[rgba(201,161,74,.5)] focus:shadow-[0_0_0_3px_rgba(201,161,74,.1)]";
-  const labelClass =
-    "mb-2 block text-[12px] font-semibold uppercase tracking-[0.5px] text-[var(--t2)]";
-
-  return (
-    <ModalShell title={`Schedule Inspection — ${monthLabel} ${year}`} onClose={onClose}>
-      <div className="px-6 py-6">
-        <div className="mb-[18px]">
-          <label className={labelClass}>Date</label>
-          <select value={day} onChange={(e) => setDay(Number(e.target.value))} className={selectClass}>
-            {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((d) => (
-              <option key={d} value={d}>{monthLabel} {d}, {year}</option>
-            ))}
-          </select>
-        </div>
-        <div className="mb-[18px]">
-          <label className={labelClass}>Building</label>
-          <select value={building} onChange={(e) => setBuilding(e.target.value)} className={selectClass}>
-            {INSPECTION_BUILDINGS.map((b) => (
-              <option key={b} value={b}>{b}</option>
-            ))}
-          </select>
-        </div>
-        <div className="mb-[18px]">
-          <label className={labelClass}>Vendor</label>
-          <select value={vid} onChange={(e) => setVid(e.target.value)} className={selectClass}>
-            {VENDORS.map((v) => (
-              <option key={v.id} value={v.id}>{v.name} ({v.trade})</option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label className={labelClass}>Inspection Type</label>
-          <select value={type} onChange={(e) => setType(e.target.value)} className={selectClass}>
-            {INSPECTION_TYPES.map((t) => (
-              <option key={t} value={t}>{t}</option>
-            ))}
-          </select>
-        </div>
-      </div>
-      <ModalFooter>
-        <button
-          onClick={onClose}
-          className="rounded-[10px] border border-[var(--bord2)] bg-[var(--surf3)] px-[16px] py-[8px] text-[13px] font-semibold text-[var(--t2)] transition-colors hover:text-[var(--t1)]"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={() => onSubmit(building, vid, day, type)}
-          className="rounded-[10px] bg-[var(--gold)] px-[16px] py-[8px] text-[13px] font-bold text-[#1A1305] transition-opacity hover:opacity-90"
-        >
-          Add to Calendar
-        </button>
-      </ModalFooter>
-    </ModalShell>
-  );
-}
-
-// ── Shared modal scaffolding (mirrors components/settings-modal.tsx) ──
-function ModalShell({
-  title, onClose, children,
-}: {
-  title: string;
-  onClose: () => void;
-  children: React.ReactNode;
-}) {
-  const backdropRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
-    }
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [onClose]);
-
-  return (
-    <div
-      ref={backdropRef}
-      className="fixed inset-0 z-[300] flex items-center justify-center bg-black/55 p-6 backdrop-blur-[10px]"
-      style={{ animation: "fadein .2s" }}
-      onClick={(e) => e.target === backdropRef.current && onClose()}
-    >
-      <div
-        className="relative w-full max-w-[500px] overflow-y-auto rounded-[var(--r3)] border border-[var(--bord2)] bg-[var(--surf2)] shadow-[var(--sh3)]"
-        style={{ maxHeight: "86vh", animation: "modalin .3s var(--ease)" }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="pointer-events-none absolute left-6 right-6 top-0 z-[1] h-[1px] bg-[linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent)]" />
-        <div className="flex items-center justify-between border-b border-[var(--bord)] px-6 py-[22px]">
-          <span className="text-[18px] font-bold tracking-[-0.3px] text-[var(--t1)]">{title}</span>
-          <button
-            onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--t2)] transition-colors hover:bg-[var(--surf3)] hover:text-[var(--t1)]"
-          >
-            ✕
-          </button>
-        </div>
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function ModalFooter({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex justify-end gap-[10px] border-t border-[var(--bord)] px-6 py-[18px]">
-      {children}
     </div>
   );
 }
